@@ -1,0 +1,31 @@
+
+ <input type="file" id="fileInput">
+ <div id='result'></div>
+ <div id='contents'></div>
+
+
+ <script src="../src/threadedFileProcessor.js"></script>
+
+ <script src="../src/threadedLineProcessor.js"></script>
+ <script src="../tests/threadedFileProcessorTest.js"></script>
+ <script src="../src/lineProcessingScripts.js"></script>
+<script>
+//byte size of single chunk
+//var chunkSize = 261504;
+var chunkSize = 8096;
+
+
+
+
+
+document.getElementById("fileInput").addEventListener("change", function() {
+
+	var file = document.getElementById("fileInput").files[0];
+
+		var t=new ThreadedFileProcessorTest({file:file, scriptFilesLocation: "../src"});
+	t.start();
+
+});
+
+
+</script>

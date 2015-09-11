@@ -1,0 +1,60 @@
+
+ <input type="file" id="fileInput">
+ <div id='result'>Lintes read: 0</div>
+ <div><h3>File contents:</h3></div>
+ <div id='contents' style="height: 70%; overflow: auto;"></div>
+
+
+ <script src="../src/threadedFileProcessor.js"></script>
+
+ <script src="../src/threadedLineProcessor.js"></script>
+ <script src="../src/lineProcessingScripts.js"></script>
+<script>
+//byte size of single chunk
+//var chunkSize = 261504;
+var chunkSize = 8096;
+var counter = 0;
+
+
+
+
+
+document.getElementById("fileInput").addEventListener("change", function() {
+
+	var file = document.getElementById("fileInput").files[0];
+
+
+	var j = new ThreadedFileProcessor({file:file, threaded: true, logging: true, scriptFilesLocation: "../src", 
+									metadata: {fileMetadata: {lineSeparator: "\n",fieldSeparator: ";", ignoreFields: true, stringQualifier: "\"", parser: "none",stringQualifierEscape: "\"", treatAllAsStrings: false}
+																							/*, fields:[
+																										{name: "src_street", fieldType: "String"},
+																										{name: "src_city", fieldType: "String"},
+																										{name: "src_province", fieldType: "String"},
+																										{name: "src_zip", fieldType: "String"}
+																										]*/
+											}
+	});
+	j.on("end", function(counter) {
+		console.log(counter);
+	});
+	j.on("line", function(line) {
+		var node = document.createElement("div");                 // Create a <li> node
+		var textnode = document.createTextNode(line);         // Create a text node
+		node.appendChild(textnode);                              // Append the text to <li>
+		document.getElementById("contents").appendChild(node);
+		counter++;
+		document.getElementById("result").innerHTML = "lines read: "+counter;
+		
+	});
+	j.on("parsedLine", function(line) {
+		console.log(line);
+	});
+
+	j.start();
+
+
+
+});
+
+
+</script>
