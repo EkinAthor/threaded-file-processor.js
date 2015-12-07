@@ -12,6 +12,11 @@ var ThreadedFileProcessor = function(options) {
 	} else {
 		this.threaded = false;
 	}
+	if(options.ignoreFirstLine !== undefined) {
+		this.ignoreFirstLine = options.ignoreFirstLine;
+	} else {
+		this.ignoreFirstLine = false;
+	}
 	//maximum number of threads(processors) to use
 	this._opts.maxThreads = options.maxThreads || 4;
 	//starting file position. Override this to "resume"
@@ -282,6 +287,16 @@ ThreadedFileProcessor.prototype.findRemnantsId = function(id) {
  * @param {String} data -line (partial)
  */
 ThreadedFileProcessor.prototype.addFirstLine = function(id,data) {
+	if(id==0){
+		var _this = this;
+		this.processFirstLine(data, function(processedLine) {			
+			_this._emit("firstLineProcessed", [processedLine]);
+		});
+		if(this.ignoreFirstLine) {
+			data ="";	
+		}	
+	}
+	
 	var index = this.findRemnantsId(id);
 	if(index !== undefined) {
 		if(this.postProcessor !== "" ) {this.postProcessor += this._opts.newLineChar;}
@@ -400,4 +415,24 @@ ThreadedFileProcessor.prototype.start = function() {
     		this._events[event].apply(this, args);
  		 }
 	};
+/**
+ * Utils - other
+ */
 
+/**
+ * processes one single line
+ * @return array representation of line
+ */
+ThreadedFileProcessor.prototype.processFirstLine = function(data,callBack) {
+	var _this = this;
+	//extra reader just to process first chunk and parse first line asynchronously
+	var lineProcessor = new ThreadedLineProcessor({linePostProcess: _this.lineProcessingScripts.linePostProcess, metadata: _this.metadata, scriptFilesLocation: _this._opts.scriptFilesLocation});
+		//lineProcessor.on("processed", function() {});
+		//this.lineProcessor.on("line", this.onLineProcess.bind(this));
+		lineProcessor.on("parsedLine", function(data) {
+			callBack(data);
+		});	
+		lineProcessor.setData(data);
+		lineProcessor.setChunkId(-1);
+		lineProcessor.start();
+}

@@ -68,6 +68,7 @@ You can provide following optional attributes:
 |threaded [*boolean*]|indicate whether to use web workers or just process evertything in single thread| *false* |
 |maxThreads [*integer*]| maximum number of threads (workers spawned). | *4* |
 |filePosition [*integer*] | experimental: starting position (in kb) in the file where reader starts reading data | *0* |
+|ignoreFirstLine [*boolean*] | ignore first line in file (it will still emit event with first line) | *false* |
 |chunkSize [*integer*] | how many kb from file to read at a time | *2048* |
 |logging [*boolean*] | enables detailed logging | *false* |
 |newLineChar [*String*] | default new line character to use in parsing | *\n* |
@@ -100,6 +101,7 @@ File processor emits events when speciffic part of the file are processed. You s
 | --------- | ----------- | ----------------- |
 | line | triggered when line is processed. | Passes original line (if not changed by pre-processing user defined function) |
 | parsedLine | triggered when line is processed and parsed (including pre-process and post-process). Is not triggered when parser is not used. | Passes processed line object|
+| firstLineProcessed | triggered when first line is parsed and processed (useable when you have to parse header in separate process) | Passes processed line object|
 | end | indicates end of processing (callback should go here) | passes integer indicating number of lines processed |
 Parsed Line Object:
 ```
